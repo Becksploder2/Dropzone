@@ -37,6 +37,19 @@ jobs:
           if not Path("DropZone_Godot4/project.godot").exists():
               raise SystemExit("Missing Godot project.godot")
           PY
+      - name: Enable macOS-compatible textures
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("DropZone_Godot4/project.godot")
+          config = path.read_text()
+          if 'textures/vram_compression/import_etc2_astc=true' not in config:
+              marker = '[rendering]'
+              if marker not in config:
+                  config += '\n[rendering]\n'
+              config = config.replace(marker, marker + '\ntextures/vram_compression/import_etc2_astc=true', 1)
+              path.write_text(config)
+          PY
       - name: Install export presets
         run: cp export_presets.cfg DropZone_Godot4/export_presets.cfg
       - name: Import and validate Godot project
@@ -70,14 +83,16 @@ jobs:
           godot --headless --path DropZone_Godot4 --export-release "macOS" "$GITHUB_WORKSPACE/build/macos/DropZone-macOS.zip"
           test -s build/macos/DropZone-macOS.zip
       - name: Upload Windows build
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: DropZone-Windows
           path: build/windows/
           if-no-files-found: error
       - name: Upload macOS build
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: DropZone-macOS
           path: build/macos/
-          if-no-files-found: error
+          if-no-files-found: warn
