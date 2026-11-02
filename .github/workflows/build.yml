@@ -43,6 +43,8 @@ jobs:
         run: python3 full_studio_patch.py
       - name: Build branching bridge and animated water
         run: python3 bridge_water_patch.py
+      - name: Apply quick-play menu and avatar hotfix
+        run: python3 quick_play_patch.py
       - name: Enable macOS-compatible textures
         run: |
           python3 - <<'PY'
