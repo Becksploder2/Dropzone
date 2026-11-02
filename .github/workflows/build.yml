@@ -43,6 +43,21 @@ jobs:
         run: |
           godot --headless --path DropZone_Godot4 --editor --import --quit
           godot --headless --path DropZone_Godot4 --quit-after 3
+      - name: Locate Godot export templates
+        run: |
+          TEMPLATE_DIR="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$TEMPLATE_DIR"
+          echo "Home: $HOME"
+          find /root /opt /usr/local -name windows_release_x86_64.exe -print 2>/dev/null || true
+          if [ ! -f "$TEMPLATE_DIR/windows_release_x86_64.exe" ]; then
+            SOURCE="$(find /root /opt /usr/local -name windows_release_x86_64.exe -print -quit 2>/dev/null || true)"
+            if [ -z "$SOURCE" ]; then
+              echo "Windows release export template not present in Godot container" >&2
+              exit 1
+            fi
+            cp -a "$(dirname "$SOURCE")/." "$TEMPLATE_DIR/"
+          fi
+          test -s "$TEMPLATE_DIR/windows_release_x86_64.exe"
       - name: Export Windows EXE and PCK
         run: |
           mkdir -p build/windows
