@@ -1,0 +1,64 @@
+name: Build Drop Zone
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract project safely
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          archive = Path("DropZone_Godot4_Playable_Source.zip")
+          if not archive.is_file():
+              raise SystemExit("Project ZIP not found")
+          with ZipFile(archive) as zipfile:
+              for entry in zipfile.infolist():
+                  p = Path(entry.filename)
+                  if p.is_absolute() or ".." in p.parts:
+                      raise SystemExit("Unsafe ZIP entry: " + entry.filename)
+              zipfile.extractall(".")
+          if not Path("DropZone_Godot4/project.godot").exists():
+              raise SystemExit("Missing Godot project.godot")
+          PY
+      - name: Install export presets
+        run: cp export_presets.cfg DropZone_Godot4/export_presets.cfg
+      - name: Import and validate Godot project
+        run: |
+          godot --headless --path DropZone_Godot4 --editor --import --quit
+          godot --headless --path DropZone_Godot4 --quit-after 3
+      - name: Export Windows EXE and PCK
+        run: |
+          mkdir -p build/windows
+          godot --headless --path DropZone_Godot4 --export-release "Windows Desktop" "$GITHUB_WORKSPACE/build/windows/DropZone.exe"
+          test -s build/windows/DropZone.exe
+          test -s build/windows/DropZone.pck
+      - name: Export macOS
+        run: |
+          mkdir -p build/macos
+          godot --headless --path DropZone_Godot4 --export-release "macOS" "$GITHUB_WORKSPACE/build/macos/DropZone-macOS.zip"
+          test -s build/macos/DropZone-macOS.zip
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropZone-Windows
+          path: build/windows/
+          if-no-files-found: error
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: DropZone-macOS
+          path: build/macos/
+          if-no-files-found: error
