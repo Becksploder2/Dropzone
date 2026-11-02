@@ -1,10 +1,10 @@
 from pathlib import Path
 p = Path("DropZone_Godot4/scripts/main.gd")
 s = p.read_text()
-needle = ' install_branching_bridge()\n create_ui()'
+needle = ' install_bridge_and_water()\n create_ui()'
 if needle not in s:
     raise SystemExit("Could not locate existing bridge installation")
-s = s.replace(needle, ' install_branching_bridge()\n restore_wide_bridge()\n create_ui()', 1)
+s = s.replace(needle, ' install_bridge_and_water()\n restore_wide_bridge()\n create_ui()', 1)
 s += '''
 
 # Wide rectangular bridge inspired by the earlier set, while retaining 3/3/2/1 decisions.
@@ -29,8 +29,8 @@ func restore_wide_bridge() -> void:
   neon(stage,Vector3(0,0.15,separator_z),Vector3(8.0,0.05,0.12),Color("36bfff"))
  # Each bank retains three lane positions; unused lanes are neutral decorative
  # glass, not trapdoors or extra possible answers.
- for row in range(bridge_panels.size()):
-  var options=bridge_panels[row]
+ for row in range(answer_panels.size()):
+  var options=answer_panels[row]
   var count=options.size()
   var chosen_lanes=[0,1,2] if count==3 else ([0,2] if count==2 else [1])
   for index in range(count):
@@ -38,7 +38,7 @@ func restore_wide_bridge() -> void:
    var new_position=Vector3((float(chosen_lanes[index])-1.0)*2.56,0.34,float(row_centers[row]))
    item["position"]=new_position
    item["mesh"].position=new_position
-   item["body"].position=new_position
+   item["collider"].position=new_position
    item["label"].position=new_position+Vector3(0,0.14,0)
   for lane in range(3):
    if chosen_lanes.has(lane): continue
