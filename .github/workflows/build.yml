@@ -37,7 +37,7 @@ jobs:
           if not Path("DropZone_Godot4/project.godot").exists():
               raise SystemExit("Missing Godot project.godot")
           PY
-      - name: Enable macOS-compatible textures
+      - name: Install enhanced 3D studio set\n        run: python3 stage_patch.py\n      - name: Enable macOS-compatible textures
         run: |
           python3 - <<'PY'
           from pathlib import Path
