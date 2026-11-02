@@ -16,6 +16,10 @@ jobs:
       image: barichello/godot-ci:4.4.1
     steps:
       - uses: actions/checkout@v4
+      - name: Install extraction dependency
+        run: |
+          apt-get update
+          apt-get install -y python3
       - name: Extract project safely
         run: |
           python3 - <<'PY'
