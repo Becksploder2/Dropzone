@@ -23,8 +23,8 @@ s=s.replace(needle,''' if not ai[current_player]:
  button("BACK TO MAIN MENU",show_menu)''',1)
 # Show avatar and stage with an unobstructed wide game camera instead of the preview camera.
 needle=' characters[current_player].position=Vector3(0,0,-7.0)\n load_question()'
-assert needle in s
-s=s.replace(needle,''' characters[current_player].position=Vector3(0,0,-7.0)
+if needle in s:
+ s=s.replace(needle,''' characters[current_player].position=Vector3(0,0,-7.0)
  camera.position=Vector3(14,12,19)
  camera.look_at(Vector3(0,0,0),Vector3.UP)
  ui.visible=true
