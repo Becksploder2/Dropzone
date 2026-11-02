@@ -39,6 +39,8 @@ jobs:
           PY
       - name: Install enhanced 3D studio set
         run: python3 stage_patch.py
+      - name: Build full 3D broadcast studio
+        run: python3 full_studio_patch.py
       - name: Enable macOS-compatible textures
         run: |
           python3 - <<'PY'
